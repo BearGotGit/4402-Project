@@ -1,3 +1,5 @@
+<!-- @format -->
+
 # Example 4402 Database Project
 
 ## Introduction
@@ -9,9 +11,10 @@ This project provides a starting point for your database project that has both a
 Before running the project, ensure you have the following prerequisites installed on your system:
 
 - [Java Development Kit (JDK)](https://www.oracle.com/java/technologies/javase-downloads.html) - version 11 or higher.
-- [Node.js](https://nodejs.org/) - version 14 or higher. 
+- [Node.js](https://nodejs.org/) - version 14 or higher.
 - [npm](https://www.npmjs.com/) - This is included with Node.js.
 - [IntelliJ IDEA](https://www.jetbrains.com/idea/download/) - Recommended for running and building the backend4402 Spring Boot application.
+  - (Berend Here, I just used VS Code, but I added some instructions below...)
 - [Visual Studio Code](https://code.visualstudio.com/download) - Used to develop the frontend4402 UI.
 
 ## Getting Started
@@ -19,6 +22,16 @@ Before running the project, ensure you have the following prerequisites installe
 Follow these steps to get the project up and running:
 
 ### Backend (Spring Boot)
+
+## Install Maven
+
+(VS Code People)
+
+- Instructions to install Maven: https://maven.apache.org/install.html
+- Maven Binaries & Source: https://maven.apache.org/download.cgi
+
+- Instructions to run Spring Boot (I ran first command and it worked): https://docs.spring.io/spring-boot/maven-plugin/run.html
+  (End VS Code People)
 
 1. Open the backend4402 folder (aka the Spring Boot project) as a JAVA PROJECT in your preferred Java IDE. I used IntelliJ and heavily recommend it.
 
@@ -29,12 +42,12 @@ Follow these steps to get the project up and running:
 1. Open a terminal and navigate to the `frontend` directory in our project, or open the frontend4402 folder in Visual Studio Code and open a new terminal. I used Visual Studio Code for all frontend development.
 
 2. Install project dependencies by running:
-    
-    npm install
+
+   npm install
 
 3. Start the React development server by running:
 
-    npm start
+   npm start
 
 This will start the frontend application on port 3000. Make modifications to the react project by using an editor like VSCode.
 
@@ -59,7 +72,7 @@ database. To create the schema and sample data for your database, you will need 
 
 - The SQL console execution feature is available on the frontend for testing pure SQL statements.
 - In order for the project to work, you must have both the frontend running on port 3000 and the backend running on port 8080.
-  
+
 ## Usage
 
 - Use the web interface to add, view, update, or delete records in the database.
