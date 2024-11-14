@@ -30,8 +30,11 @@ Follow these steps to get the project up and running:
 - Instructions to install Maven: https://maven.apache.org/install.html
 - Maven Binaries & Source: https://maven.apache.org/download.cgi
 
+- Useful Maven commands ([https://maven.apache.org/guides/getting-started/maven-in-five-minutes.html](https://maven.apache.org/guides/getting-started/maven-in-five-minutes#Running_Maven_Tools))
+  
 - Instructions to run Spring Boot (I ran first command and it worked): https://docs.spring.io/spring-boot/maven-plugin/run.html
-  (End VS Code People)
+
+(End VS Code People)
 
 1. Open the backend4402 folder (aka the Spring Boot project) as a JAVA PROJECT in your preferred Java IDE. I used IntelliJ and heavily recommend it.
 
