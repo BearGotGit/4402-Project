@@ -1,7 +1,7 @@
 -- Example file that defines the schema for the database.
 -- All relations will be defined here, like the one below.
 
-CREATE TABLE Employee (
+CREATE TABLE EMPLOYEE (
     EmployeeID INT AUTO_INCREMENT PRIMARY KEY,
     FirstName VARCHAR(50),
     LastName VARCHAR(50),
@@ -9,11 +9,12 @@ CREATE TABLE Employee (
     Salary DECIMAL(10, 2)
 );
 
-CREATE TABLE Warehouse (
+CREATE TABLE WAREHOUSE (
     WarehouseID INT AUTO_INCREMENT PRIMARY KEY,
     Address VARCHAR(100),
     -- TODO: composite type for ITEM
-    Inventory INT
+    Inventory INT FOREIGN KEY 
+    FOREIGN KEY (Inventory) REFERENCES ITEM(ItemID)
 );
 
 CREATE TABLE ITEM (
@@ -23,7 +24,7 @@ CREATE TABLE ITEM (
     Price DECIMAL(10, 2),
     Count INT,
     WarehouseID INT FOREIGN KEY,
-    FOREIGN KEY (WarehouseID) REFERENCES Warehouse(WarehouseID)
+    FOREIGN KEY (WarehouseID) REFERENCES WAREHOUSE(WarehouseID)
 );
 
 CREATE TABLE ORDER (
@@ -47,7 +48,7 @@ CREATE TABLE RECIPE (
     Price DECIMAL(10, 2),
     Count INT,
     WarehouseID INT FOREIGN KEY,
-    FOREIGN KEY (WarehouseID) REFERENCES Warehouse(WarehouseID)
+    FOREIGN KEY (WarehouseID) REFERENCES WAREHOUSE(WarehouseID)
 )
 
 CREATE TABLE PLAN (
@@ -101,7 +102,7 @@ CREATE TABLE INGREDIENT (
     Price DECIMAL(10, 2),
     Count INT,
     WarehouseID INT FOREIGN KEY,
-    FOREIGN KEY (WarehouseID) REFERENCES Warehouse(WarehouseID)
+    FOREIGN KEY (WarehouseID) REFERENCES WAREHOUSE(WarehouseID)
 )
 
 -- DEFINE YOUR TABLES HERE
