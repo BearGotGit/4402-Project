@@ -39,7 +39,7 @@ CREATE TABLE RECIPE (
     Count INT,
     WarehouseID INT
     -- FOREIGN KEY (WarehouseID) REFERENCES WAREHOUSE(WarehouseID)
-);
+)
 
 -- CREATE TABLE PLAN (
 --     PlanID INT AUTO_INCREMENT PRIMARY KEY,
