@@ -43,6 +43,7 @@ CREATE TABLE RECIPE (
 
 -- CREATE TABLE PLAN (
 --     PlanID INT AUTO_INCREMENT PRIMARY KEY,
+--     Name CHAR(50)
 --     Price DECIMAL(10, 2),
 --     Calories INT,
 --     Frequency INT,
@@ -106,3 +107,8 @@ CREATE TABLE RECIPE (
 --     -- FOREIGN KEY (CustomerID) REFERENCES Customer(CustomerID),
 --     -- FOREIGN KEY (ItemID) REFERENCES Item(ItemID)
 -- )
+
+
+-- canceled subscription
+-- check available driver
+-- check test driver 

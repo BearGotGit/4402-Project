@@ -84,3 +84,15 @@ database. To create the schema and sample data for your database, you will need 
 
 - Example project for class created by Sadie Forbes
 - {TEAM MEMBERS NAMES GO HERE}
+
+# CLI Instructions
+
+install sqlite3 both on machine &/or from vs code extensions
+
+To compile & run:
+clang++ main.cpp -o main -lsqlite3
+g++ main.cpp -o main -lsqlite3
+then run ./main 
+
+To delete th entire database, just delete database.db and run ./main again, and it will work. 
+

@@ -101,3 +101,8 @@ erDiagram
     INVOICE ||--|| RECIPE : details
     %% Each invoice is for one recipe, but recipes can show up on multiple invoices.
 
+```
+
+Schema Diagram:
+
+Employee(EmployeeID, FirstName, LastName, Department, Salary)
