@@ -72,13 +72,13 @@ int main(int argc, char* argv[])
         // The options to prompt the user with ( Team members: please write whatever you will do and then implement it below )
         std::string prompt = 
 R"(
-Press 0 to exit the program.
-Press 1 to sign up.
-Press 2 to delete your account and all your data.
+Press 0 to exit the program [done - Zach].
+Press 1 to sign up [done - Zach].
+Press 2 to delete your account and all your data [done - Zach].
 Press 3 to [].
 Press 4 to [].
 Press 5 to [].
-Press 6 to enter SQL queries directly.
+Press 6 to enter SQL queries directly [done - Zach].
 )";
 
         std::cout << prompt << std::endl; // Outputs the prompt to the console
