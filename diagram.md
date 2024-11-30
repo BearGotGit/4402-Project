@@ -11,7 +11,6 @@ erDiagram
     WAREHOUSE {
         INT WarehouseID PK
         VARCHAR WarehouseAddress
-        INT ItemID
     }
 
     ITEM {
@@ -25,7 +24,7 @@ erDiagram
 
     RECIPE {
         INT RecipeID PK
-        INT IngredientID
+        INT IngredientID FK
         INT Calories
         VARCHAR RecipeName
         VARCHAR RecipeDescription
@@ -34,11 +33,30 @@ erDiagram
         INT WarehouseID FK
     }
 
-    USER {
+    PLAN {
+        INT PlanID PK
+        VARCHAR Name
+        DECIMAL Price
+        INT Calories
+        INT Frequency
+        INT NumberOfMeals
+    }
+
+    DRIVER {
+        INT DriverID PK
+        VARCHAR FirstName
+        VARCHAR LastName
+        INT ZipCode
+        DECIMAL RatePerMile
+        DECIMAL SumOfTips
+        DECIMAL SumOfMiles
+    }
+
+    USER_TABLE {
         INT UserID PK
-        VARCHAR PhoneNumber
+        VARCHAR Phone
         VARCHAR Email
-        PASSWORD Password
+        VARCHAR Password
         VARCHAR FirstName
         VARCHAR LastName
         VARCHAR Address
@@ -55,14 +73,13 @@ erDiagram
         INT UserID FK
     }
 
-    DRIVER {
-        INT DriverID PK
-        VARCHAR FirstName
-        VARCHAR LastName
-        INT ZipCode
-        DECIMAL RatePerMile
-        DECIMAL SumOfTips
-        DECIMAL SumOfMiles
+    INGREDIENT {
+        INT IngredientID PK
+        VARCHAR Name
+        VARCHAR Description
+        DECIMAL Price
+        INT Count
+        INT WarehouseID FK
     }
 
     INVOICE {
@@ -75,34 +92,23 @@ erDiagram
 
     %% Relationships between the tables
     EMPLOYEE ||--o{ WAREHOUSE : manages
-    %% Each warehouse has one employee managing it, but employees can manage multiple warehouses.
-
     WAREHOUSE ||--o{ ITEM : stores
-    %% Warehouses can store a lot of items, but each item is stored in just one warehouse.
-
     WAREHOUSE ||--o{ RECIPE : contains
-    %% A warehouse can have multiple recipes, but a recipe is tied to one warehouse.
+    WAREHOUSE ||--o{ INGREDIENT : holds
 
     ITEM ||--o{ RECIPE : used_in
-    %% Items can be used in several recipes, and recipes use a bunch of different items.
 
-    RECIPE ||--o{ ADDRESS : includes
-    %% Recipes might include ingredients from specific addresses (like suppliers or other locations).
+    RECIPE ||--o{ INVOICE : included_in
+    RECIPE ||--o| INGREDIENT : uses
 
-    USER ||--o{ ADDRESS : resides_at
-    %% Users can have a bunch of addresses (like home and work), but each address is linked to just one user.
-
-    USER ||--o{ INVOICE : makes
-    %% A user can make a lot of invoices (like one for each order), but each invoice belongs to just one user.
+    USER_TABLE ||--o{ ADDRESS : resides_at
+    USER_TABLE ||--o{ INVOICE : makes
+    USER_TABLE ||--o| PLAN : subscribes_to
 
     DRIVER ||--o{ INVOICE : delivers
-    %% Drivers deliver multiple invoices, but each invoice is assigned to one specific driver.
 
     INVOICE ||--|| RECIPE : details
-    %% Each invoice is for one recipe, but recipes can show up on multiple invoices.
 
+    INGREDIENT ||--|{ WAREHOUSE : stored_at
+    PLAN ||--o{ USER_TABLE : includes
 ```
-
-Schema Diagram:
-
-Employee(EmployeeID, FirstName, LastName, Department, Salary)

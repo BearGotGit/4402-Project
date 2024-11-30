@@ -6,7 +6,7 @@
 
 // Callback function to display query results
 static int callback(void* NotUsed, int argc, char** argv, char** azColName)
-{
+{ // callback //
     for(int i = 0; i < argc; i++)
     {
         std::cout << azColName[i] << " = " 
@@ -15,11 +15,11 @@ static int callback(void* NotUsed, int argc, char** argv, char** azColName)
 
     std::cout << std::endl;
     return 0;
-}
+} // callback //
 
-// Function to escape single quotes in strings
+// Function to escape single quotes in strings (due to SQL syntax requirements)
 std::string EscapeSingleQuotes(const std::string& str)
-{
+{ // EscapeSingleQuotes //
     std::string escaped = str;
     size_t pos = 0;
     while((pos = escaped.find("'", pos)) != std::string::npos)
@@ -28,41 +28,39 @@ std::string EscapeSingleQuotes(const std::string& str)
         pos += 2; // Move past the escaped quote
     }
     return escaped;
-}
+} // EscapeSingleQuotes //
 
 int main(int argc, char* argv[])
-{
-    // Initialize database variable 
+{ // main //
+    // init sqlite3 db struct, error message, and return code
     sqlite3* db;
     char* zErrMsg = 0;
     int rc;
 
-    // Seed the random number generator
+    // Seed the random number generator (used for user ID generation)
     srand(static_cast<unsigned int>(time(nullptr)));
 
-    // Database name
+    // Database file name - will be created if it doesn't exist
     std::string db_name = "mydatabase.db";
 
-    // Execute the setup.sh file 
+    // Execute the setup.sh file (populates the database with the schema / tables and then inserts data)
     std::string setup_command = "sh setup.sh";
     std::cout << "Executing \"" << setup_command << "\" to init the database." << std::endl;
     system(setup_command.c_str());
-
     std::cout << "Opening database \"" << db_name << "\" (just initialized above)." << std::endl;
+    
     // Open SQLite database / creates one if it doesn't exist
     rc = sqlite3_open(db_name.c_str(), &db);
 
     if(rc || db == nullptr)
-    {
+    { // i // 
         std::cerr << "Can't open database: " << sqlite3_errmsg(db) << std::endl;
         sqlite3_close(db); // Close database if open
         return 1;
-    }
-    else
-    {
-        std::cout << "Opened database successfully: " << db_name << std::endl;
-    }
+    } // i //
+    else { std::cout << "Opened database successfully: " << db_name << std::endl; }
 
+    // The options to prompt the user with ( Team members: please write whatever you will do and then implement it below )
     std::string prompt = R"(
     Press 1 to sign up.
     Press 2 to delete your account and all your data.
@@ -72,22 +70,41 @@ int main(int argc, char* argv[])
     Press 6 to enter SQL queries directly.
     )";
 
-    std::cout << prompt << std::endl;
+    std::cout << prompt << std::endl; // outputs the prompt to the console
 
-    // Grab the input 
+    // Grab the choice from user 
     int n = 0;
     std::cin >> n;
     std::cin.ignore(); // Consume leftover newline
 
-    // Declare variables
+    // init the variables you will use to capture your input for your case here:
+    // Case 1 Variables // 
     std::string u_first, u_last, u_address, u_email, u_card_name, u_card_address, u_card_exp;
     std::string u_phone, u_card_number;
     int u_card_cvv = 0, u_plan_choice = 0;
+    // Case 1 Variables //
+
+    // Case 2 Variables //
+
+    // Case 2 Variables //
+
+    // Case 3 Variables //
+
+    // Case 3 Variables //
+
+    // Case 4 Variables //
+
+    // Case 4 Variables //
+
+    // Case 5 Variables // 
+
+    // Case 5 Variables //
+
 
     switch(n)
-    {
+    { // switch //
         case 1:
-        {
+        { // case 1 //
             std::cout << "Thanks for signing up! Please enter the following info as prompted:\n";
 
             // User info
@@ -229,25 +246,33 @@ int main(int argc, char* argv[])
             // Free the memory allocated by sqlite3_mprintf
             sqlite3_free(sql_insert_user);
             break;
-        }
+        } // case 1 //
         case 2:
+        { // case 2 //
             // Implementation for deleting account and data
             std::cout << "Feature not implemented yet.\n";
             break;
+        } // case 2 //
         case 3:
+        { // case 3 //
             // Implementation for option 3
             std::cout << "Feature not implemented yet.\n";
             break;
+        } // case 3 //
         case 4:
+        { // case 4 //
             // Implementation for option 4
             std::cout << "Feature not implemented yet.\n";
             break;
+        } // case 4 //
         case 5:
+        { // case 5 //
             // Implementation for option 5
             std::cout << "Feature not implemented yet.\n";
             break;
+        } // case 5 //
         case 6:
-        {
+        { // case 6 //
             std::cout << "Enter SQL queries to execute. Type 'exit' to quit.\n";
             while(true)
             {
@@ -272,11 +297,13 @@ int main(int argc, char* argv[])
                 }
             }
             break;
-        }
+        } // case 6 //
         default:
+        { // default //
             std::cout << "You entered an invalid choice. Please rerun and try again.\n";
             sqlite3_close(db);
             return 1;
+        } // default //
     }
 
     // Close SQLite database
