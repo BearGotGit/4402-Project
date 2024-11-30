@@ -293,7 +293,13 @@ Press 4 to remove by your user ID.
                         std::cout << "Enter the email of the user you wish to remove: ";
                         std::cin >> r_email;
                         std::cin.ignore();
-                        sqlite3_exec(db, ("DELETE FROM USER WHERE Email = '" + r_email + "';").c_str(), callback, 0, &zErrMsg);
+                        rc = sqlite3_exec(db, ("DELETE FROM USER WHERE Email = '" + r_email + "';").c_str(), callback, 0, &zErrMsg);
+                        if(rc != SQLITE_OK)
+                        { // i //
+                            std::cerr << "SQL error: " << zErrMsg << std::endl;
+                            sqlite3_free(zErrMsg);
+                        } // i //
+                        else { std::cout << "User removed successfully.\n"; }
                         break;
                     } // case 1 //
                     case 2:
@@ -301,7 +307,13 @@ Press 4 to remove by your user ID.
                         std::cout << "Enter the phone number of the user you wish to remove: ";
                         std::cin >> r_phone;
                         std::cin.ignore();
-                        sqlite3_exec(db, ("DELETE FROM USER WHERE Phone = '" + r_phone + "';").c_str(), callback, 0, &zErrMsg);
+                        rc = sqlite3_exec(db, ("DELETE FROM USER WHERE Phone = '" + r_phone + "';").c_str(), callback, 0, &zErrMsg);
+                        if(rc != SQLITE_OK)
+                        { // i //
+                            std::cerr << "SQL error: " << zErrMsg << std::endl;
+                            sqlite3_free(zErrMsg);
+                        } // i //
+                        else { std::cout << "User removed successfully.\n"; }
                         break;
                     } // case 2 //
                     case 3:
@@ -309,7 +321,13 @@ Press 4 to remove by your user ID.
                         std::cout << "Enter the address of the user you wish to remove: ";
                         std::cin >> r_id;
                         std::cin.ignore();
-                        sqlite3_exec(db, ("DELETE FROM USER WHERE Address = '" + r_address + "';").c_str(), callback, 0, &zErrMsg);
+                        rc = sqlite3_exec(db, ("DELETE FROM USER WHERE Address = '" + r_address + "';").c_str(), callback, 0, &zErrMsg);
+                        if(rc != SQLITE_OK)
+                        { // if //
+                            std::cerr << "SQL error: " << zErrMsg << std::endl;
+                            sqlite3_free(zErrMsg);
+                        } // i //
+                        else { std::cout << "User removed successfully.\n"; }
                         break;
                     } // case 3 //
                     case 4:
@@ -317,7 +335,13 @@ Press 4 to remove by your user ID.
                         std::cout << "Enter the User ID of the user you wish to remove: ";
                         std::cin >> r_id;
                         std::cin.ignore();
-                        sqlite3_exec(db, ("DELETE FROM USER WHERE UserID = " + std::to_string(r_id) + ";").c_str(), callback, 0, &zErrMsg);
+                        rc = sqlite3_exec(db, ("DELETE FROM USER WHERE UserID = " + std::to_string(r_id) + ";").c_str(), callback, 0, &zErrMsg);
+                        if(rc != SQLITE_OK)
+                        { // if //
+                            std::cerr << "SQL error: " << zErrMsg << std::endl;
+                            sqlite3_free(zErrMsg);
+                        } // i //
+                        else { std::cout << "User removed successfully.\n"; }
                         break;
                     } // case 4 //
 
