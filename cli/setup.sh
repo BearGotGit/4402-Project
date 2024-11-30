@@ -2,11 +2,11 @@
 
 cd "$(dirname "${BASH_SOURCE[0]}")" || { echo "Failed to change directory"; exit 1; }
 
-DB_FILE="./mydatabase.db"
+DB_FILE="./db.db"
 SCHEMA_FILE="./schema_setup.sql"
 DATA_FILE="./data_population.sql"
 
-REQUIRED_TABLES=("PLAN" "DRIVER" "EMPLOYEE" "WAREHOUSE" "INGREDIENT" "RECIPE" "USER_TABLE" "ADDRESS" "INVOICE")
+REQUIRED_TABLES=("PLAN" "DRIVER" "EMPLOYEE" "WAREHOUSE" "INGREDIENT" "RECIPE" "USER" "ADDRESS" "INVOICE")
 
 initialize_database() {
     echo "Creating database schema..."
