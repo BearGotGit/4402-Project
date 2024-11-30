@@ -36,7 +36,7 @@ int main(int argc, char* argv[])
 
     // TEST //
     // for your test case, uncomment the line below and enter the name of your case file. Also, run 'rm -rf db.db' before running your test
-    freopen("case1_test.txt", "r", stdin); // replaces input from console with input from test case file
+    //freopen("case1_test.txt", "r", stdin); // replaces input from console with input from test case file
     // TEST // 
 
     // Initialize sqlite3 db struct, error message, and return code

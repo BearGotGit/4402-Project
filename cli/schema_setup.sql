@@ -9,7 +9,7 @@ CREATE TABLE IF NOT EXISTS Employee (
     Department VARCHAR(50),
     Salary DECIMAL(10, 2)
 );
-
+/
 -- Warehouse table
 CREATE TABLE IF NOT EXISTS Warehouse (
     WarehouseID INT AUTO_INCREMENT PRIMARY KEY,
