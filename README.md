@@ -96,3 +96,5 @@ then run ./main
 
 To delete th entire database, just delete database.db and run ./main again, and it will work. 
 
+
+

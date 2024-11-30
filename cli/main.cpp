@@ -1,6 +1,8 @@
 #include <iostream>
 #include <sqlite3.h>
 #include <string>
+#include <cstdlib>
+#include <ctime>
 
 // Callback function to display query results
 static int callback(void* NotUsed, int argc, char** argv, char** azColName)
@@ -35,9 +37,18 @@ int main(int argc, char* argv[])
     char* zErrMsg = 0;
     int rc;
 
+    // Seed the random number generator
+    srand(static_cast<unsigned int>(time(nullptr)));
+
     // Database name
     std::string db_name = "mydatabase.db";
 
+    // Execute the setup.sh file 
+    std::string setup_command = "sh setup.sh";
+    std::cout << "Executing \"" << setup_command << "\" to init the database." << std::endl;
+    system(setup_command.c_str());
+
+    std::cout << "Opening database \"" << db_name << "\" (just initialized above)." << std::endl;
     // Open SQLite database / creates one if it doesn't exist
     rc = sqlite3_open(db_name.c_str(), &db);
 
@@ -96,7 +107,7 @@ int main(int argc, char* argv[])
             std::cin.ignore();
 
             // User payment info
-            std::cout << "\nYou will now enter your payment info:\n";
+            std::cout << "\nYou wbackend4402/src/main/resources/schema.sqlill now enter your payment info:\n";
             std::cout << "\nPlease enter your card # (no spaces or symbols between numbers): ";
             std::cin >> u_card_number;
             std::cin.ignore();
@@ -114,6 +125,9 @@ int main(int argc, char* argv[])
             std::cout << "\nCVV: ";
             std::cin >> u_card_cvv;
             std::cin.ignore();
+
+            // Combine payment info
+            std::string u_payment_info = u_card_number + "," + u_card_name + "," + u_card_address + "," + u_card_exp + "," + std::to_string(u_card_cvv);
 
             // Display available plans
             std::cout << "\nHere are the following plan options:\n";
@@ -144,25 +158,72 @@ int main(int argc, char* argv[])
             u_card_address = EscapeSingleQuotes(u_card_address);
             u_card_exp = EscapeSingleQuotes(u_card_exp);
 
+            // Generate a unique random User ID
+            int user_id;
+            bool is_unique = false;
+            int attempts = 0;
+            const int MAX_ATTEMPTS = 1000;
+
+            while(!is_unique && attempts < MAX_ATTEMPTS)
+            {
+                user_id = rand() % 9000 + 1000; // Generates a number between 1000 and 9999
+                std::string check_query = "SELECT 1 FROM USER_TABLE WHERE UserID = " + std::to_string(user_id) + " LIMIT 1;";
+                
+                bool exists = false;
+
+                // Callback to set exists flag
+                auto exists_callback = [](void* data, int argc, char** argv, char** azColName) -> int {
+                    bool* exists_ptr = static_cast<bool*>(data);
+                    *exists_ptr = true;
+                    return 0;
+                };
+
+                rc = sqlite3_exec(db, check_query.c_str(), exists_callback, &exists, &zErrMsg);
+                if(rc != SQLITE_OK)
+                {
+                    std::cerr << "SQL error during UserID check: " << zErrMsg << std::endl;
+                    sqlite3_free(zErrMsg);
+                    break;
+                }
+
+                if(!exists)
+                {
+                    is_unique = true;
+                }
+
+                attempts++;
+            }
+
+            if(!is_unique)
+            {
+                std::cerr << "Failed to generate a unique User ID after " << MAX_ATTEMPTS << " attempts." << std::endl;
+                sqlite3_close(db);
+                return 1;
+            }
+
+            std::cout << "Assigned User ID: " << user_id << std::endl;
+
             // Build the SQL INSERT statement using sqlite3_mprintf to prevent SQL injection
             char* sql_insert_user = sqlite3_mprintf(
-                "INSERT INTO User (FirstName, LastName, Address, Email, Phone, CardNumber, CardName, CardAddress, CardExp, CardCVV, PlanID) "
-                "VALUES ('%q', '%q', '%q', '%q', '%q', '%q', '%q', '%q', '%q', %d, %d);",
+                "INSERT INTO USER_TABLE (UserID, FirstName, LastName, Address, Email, PhoneNumber, PaymentInfo, PlanID) "
+                "VALUES (%d, '%q', '%q', '%q', '%q', '%q', '%q', %d);",
+                user_id,
                 u_first.c_str(), u_last.c_str(), u_address.c_str(), u_email.c_str(), u_phone.c_str(),
-                u_card_number.c_str(), u_card_name.c_str(), u_card_address.c_str(), u_card_exp.c_str(),
-                u_card_cvv, u_plan_choice
+                u_payment_info.c_str(),
+                u_plan_choice
             );
-
+            
             // Execute the SQL statement
             rc = sqlite3_exec(db, sql_insert_user, nullptr, 0, &zErrMsg);
             if(rc != SQLITE_OK)
             {
                 std::cerr << "SQL error: " << zErrMsg << std::endl;
-                sqlite3_free(zErrMsg);
+                sqlite3_free(zErrMsg);            
+
             }
             else
             {
-                std::cout << "New user added successfully.\n";
+                std::cout << "New user added successfully with User ID: " << user_id << ".\n";
             }
 
             // Free the memory allocated by sqlite3_mprintf
