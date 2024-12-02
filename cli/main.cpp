@@ -76,7 +76,7 @@ Press 0 to exit the program [done - Zach].
 Press 1 to sign up [done - Zach].
 Press 2 to delete your account and all your data [done - Zach].
 Press 3 to [].
-Press 4 to [].
+Press 4 to sign up to be a driver [working - josh].
 Press 5 to [].
 Press 6 to enter SQL queries directly [done - Zach].
 )";
@@ -109,6 +109,9 @@ Press 4 to remove by your user ID.
         // Case 2 Variables //
 
         // Case 3 Variables //
+        std::string d_first, d_last;
+        int d_zip;
+        float d_rate, d_tips, d_miles;
         // Case 3 Variables //
 
         // Case 4 Variables //
@@ -362,7 +365,86 @@ Press 4 to remove by your user ID.
             case 4:
             { // case 4 //
                 // Implementation for option 4
-                std::cout << "Feature not implemented yet.\n";
+                std::cout << "First and last name ([FirstName] [LastName]): ";
+                std::cin >> d_first >> d_last;
+                std::cin.ignore();
+
+                std::cout << "Zipcode: ";
+                std::cin >> d_zip;
+
+                std::cout << "Enter starting rate per mile: ";
+                std::cin >> d_rate;
+
+                d_tips = 0.00; // initialize starting tips and miles to zero
+                d_miles = 0.00;
+
+                // Escape single quotes in user inputs
+                d_first = EscapeSingleQuotes(u_first);
+                d_last = EscapeSingleQuotes(u_last);
+
+                // Generate a unique random User ID
+                int driver_id;
+                bool is_unique = false;
+                int attempts = 0;
+                const int MAX_ATTEMPTS = 1000;
+
+                while(!is_unique && attempts < MAX_ATTEMPTS)
+                { // while //
+                    driver_id = rand() % 9000 + 1000; // Generates a number between 1000 and 9999
+                    std::string check_query = "SELECT 1 FROM DRIVER WHERE DriverID = " + std::to_string(driver_id) + " LIMIT 1;";
+                    
+                    bool exists = false;
+
+                    // Callback to set exists flag
+                    auto exists_callback = [](void* data, int argc, char** argv, char** azColName) -> int {
+                        bool* exists_ptr = static_cast<bool*>(data);
+                        *exists_ptr = true;
+                        return 0;
+                    };
+
+                    rc = sqlite3_exec(db, check_query.c_str(), exists_callback, &exists, &zErrMsg);
+                    if(rc != SQLITE_OK)
+                    { // if //
+                        std::cerr << "SQL error during DriverID check: " << zErrMsg << std::endl;
+                        sqlite3_free(zErrMsg);
+                        break;
+                    } // if //
+
+                    if(!exists) { is_unique = true; }
+
+                    attempts++;
+                } // while //
+
+                if(!is_unique)
+                { // if //
+                    std::cerr << "Failed to generate a unique Driver ID after " << MAX_ATTEMPTS << " attempts." << std::endl;
+                    sqlite3_close(db);
+                    return 1;
+                } // if //
+
+                std::cout << "Assigned Driver ID: " << driver_id << std::endl;
+
+                // Build the SQL INSERT statement using sqlite3_mprintf to prevent SQL injection
+                char* sql_insert_driver = sqlite3_mprintf(
+                    "INSERT INTO DRIVER (DriverID, FirstName, LastName, ZipCode, RatePerMile, SumOfTips, SumOfMiles) "
+                    "VALUES (%d, '%q', '%q', %d, %.2f, %.2f, %.2f);",
+                    driver_id,
+                    d_first.c_str(), d_last.c_str(),
+                    d_zip, d_rate, d_tips, d_miles
+                );
+            
+                // Execute the SQL statement
+                rc = sqlite3_exec(db, sql_insert_driver, nullptr, 0, &zErrMsg);
+                if(rc != SQLITE_OK)
+                { // if //
+                    std::cerr << "SQL error: " << zErrMsg << std::endl;
+                    sqlite3_free(zErrMsg);            
+                } // if //
+                else { std::cout << "New driver added successfully with Driver ID: " << driver_id << ".\n"; }
+
+                // Free the memory allocated by sqlite3_mprintf
+                sqlite3_free(sql_insert_driver);
+
                 break;
             } // case 4 //
             case 5:
