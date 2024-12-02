@@ -1,0 +1,60 @@
+1
+Mike Tiger
+1234 LSU Dr, Baton Rouge, LA 70820
+mtiger@lsu.edu
+2250000000
+password
+password
+1111222233334444
+Tiger Pays
+1234 LSU Dr, Baton Rouge, LA 70820
+01/2099
+123
+3
+
+1
+Jane Smith
+5678 ABC Ave, New Orleans, LA 70001
+jsmith@example.com
+2251112222
+password
+password
+5555666677778888
+Smith Funds
+5678 ABC Ave, New Orleans, LA 70001
+02/2100
+456
+3
+
+1
+John Doe
+9101 XYZ Blvd, Lafayette, LA 70501
+jdoe@example.com
+2253334444
+password
+password
+9999000011112222
+Doe Investments
+9101 XYZ Blvd, Lafayette, LA 70501
+03/2101
+789
+3
+
+1
+Alice Brown
+1213 DEF Street, Shreveport, LA 70070
+abrown@example.com
+2255556666
+password
+password
+3333444455556666
+Brown Savings
+1213 DEF Street, Shreveport, LA 70070
+04/2102
+012
+3
+
+6 
+select UserID, Phone, Email, FirstName, LastName, Address, PlanID, PaymentInfo from user;
+exit
+0
