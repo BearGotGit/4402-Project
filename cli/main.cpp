@@ -1,3 +1,4 @@
+
 #include <iostream>
 #include <sqlite3.h>
 #include <string>
@@ -7,12 +8,11 @@
 
 // Callback function to display query results
 
-
-static int callback(void* NotUsed, int argc, char** argv, char **azColName)
+static int callback(void *NotUsed, int argc, char **argv, char **azColName)
 { // callback //
-    for(int i = 0; i < argc; i++)
+    for (int i = 0; i < argc; i++)
     {
-        std::cout << azColName[i] << " = " 
+        std::cout << azColName[i] << " = "
                   << (argv[i] ? argv[i] : "NULL") << "\t";
     }
 
@@ -22,11 +22,11 @@ static int callback(void* NotUsed, int argc, char** argv, char **azColName)
 
 // Function to escape single quotes in strings (due to SQL syntax requirements)
 
-std::string EscapeSingleQuotes(const std::string& str)
+std::string EscapeSingleQuotes(const std::string &str)
 { // EscapeSingleQuotes //
     std::string escaped = str;
     size_t pos = 0;
-    while((pos = escaped.find("'", pos)) != std::string::npos)
+    while ((pos = escaped.find("'", pos)) != std::string::npos)
     {
         escaped.insert(pos, "'");
         pos += 2; // Move past the escaped quote
@@ -34,7 +34,7 @@ std::string EscapeSingleQuotes(const std::string& str)
     return escaped;
 } // EscapeSingleQuotes //
 
-int main(int argc, char* argv[])
+int main(int argc, char *argv[])
 
 { // main //
 
@@ -87,7 +87,7 @@ Press 0 to exit the program [done - Zach].
 Press 1 to sign up [done - Zach].
 Press 2 to delete your account and all your data [done - Zach].
 Press 3 to change or cancel your subscription [- Bayla].
-Press 4 to [].
+Press 4 to sign up to be a driver [working - josh].
 Press 5 to [].
 Press 6 to enter SQL queries directly [done - Zach].
 )";
@@ -107,8 +107,8 @@ Press 6 to enter SQL queries directly [done - Zach].
         // Case 1 Variables //
 
         // Case 2 Variables //
-        std::string remove_by_prompt =          
-R"(
+        std::string remove_by_prompt =
+            R"(
 Press 1 to remove by email.
 Press 2 to remove by phone.
 Press 3 to remove by address.
@@ -127,6 +127,10 @@ Press 1 to change subscription.
 Press 2 to cancel subscription.
 )";
 
+        std::string d_first, d_last;
+        int d_zip;
+        float d_rate, d_tips, d_miles;
+
         // Case 3 Variables //
 
         // Case 4 Variables //
@@ -135,245 +139,265 @@ Press 2 to cancel subscription.
         // Case 5 Variables //
         // Case 5 Variables //
 
-
-        switch(n)
+        switch (n)
         { // switch //
-            case 0:
-            { // case 0 //
-                std::cout << "Exiting program." << std::endl;
+        case 0:
+        { // case 0 //
+            std::cout << "Exiting program." << std::endl;
+            sqlite3_close(db);
+            return 0;
+        } // case 0 //
+
+        case 1:
+        { // case 1 //
+            std::cout << "Thanks for signing up! Please enter the following info as prompted:\n";
+
+            // User info
+            std::cout << "First and last name ([FirstName] [LastName]): ";
+            std::cin >> u_first >> u_last;
+            std::cin.ignore(); // Consume leftover newline
+
+            std::cout << "\nUS address ([Street Address or P.O. Box], [City], [State] [ZIP Code]):\n";
+            std::getline(std::cin, u_address);
+
+            std::cout << "\nEmail: ";
+            std::cin >> u_email;
+            std::cin.ignore();
+
+            std::cout << "\nPhone (no spaces or parentheses - ex: 1234567890): ";
+            std::cin >> u_phone;
+            std::cin.ignore();
+
+            std::cout << "\nPassword: ";
+            std::cin >> u_password;
+            std::cin.ignore();
+            std::cout << "\nConfirm password: ";
+            std::cin >> u_password_confirm;
+            std::cin.ignore();
+
+            if (u_password != u_password_confirm)
+            { // if //
+                std::cout << "Passwords do not match. Please rerun and try again.\n";
+                break;
+            } // if //
+
+            // manually free / delete u_password_confim for security reasons
+            u_password_confirm.clear();
+            u_password_confirm.shrink_to_fit();
+
+            // User payment info
+            std::cout << "\nYou will now enter your payment info:\n";
+            std::cout << "\nPlease enter your card # (no spaces or symbols between numbers): ";
+            std::cin >> u_card_number;
+            std::cin.ignore();
+
+            std::cout << "\nPlease enter the name on the card:\n";
+            std::getline(std::cin, u_card_name);
+
+            std::cout << "\nUS billing address ([Street Address or P.O. Box], [City], [State] [ZIP Code]):\n";
+            std::getline(std::cin, u_card_address);
+
+            std::cout << "\nExpiration date ([Month]/[Year - 4 digits] - ex: 10/2024): ";
+            std::cin >> u_card_exp;
+            std::cin.ignore();
+
+            std::cout << "\nCVV: ";
+            std::cin >> u_card_cvv;
+            std::cin.ignore();
+
+            // Combine payment info
+            std::string u_payment_info = u_card_number + "," + u_card_name + "," + u_card_address + "," + u_card_exp + "," + std::to_string(u_card_cvv);
+
+            // Display available plans
+            std::cout << "\nHere are the following plan options:\n";
+            rc = sqlite3_exec(db, "SELECT PlanID, Name, Price, Calories, Frequency, NumberOfMeals FROM PLAN;", callback, 0, &zErrMsg);
+
+            if (rc != SQLITE_OK)
+            { // if //
+                std::cerr << "SQL error: " << zErrMsg << std::endl;
+                sqlite3_free(zErrMsg);
                 sqlite3_close(db);
-                return 0;
-            } // case 0 //
+                return 1;
+            } // if //
+            else
+            {
+                std::cout << "Available plans displayed above.\n";
+            }
 
-            case 1:
-            { // case 1 //
-                std::cout << "Thanks for signing up! Please enter the following info as prompted:\n";
+            std::cout << "Enter the Plan ID you choose: ";
+            std::cin >> u_plan_choice;
+            std::cin.ignore();
 
-                // User info
-                std::cout << "First and last name ([FirstName] [LastName]): ";
-                std::cin >> u_first >> u_last;
-                std::cin.ignore(); // Consume leftover newline
+            // Escape single quotes in user inputs
+            u_first = EscapeSingleQuotes(u_first);
+            u_last = EscapeSingleQuotes(u_last);
+            u_address = EscapeSingleQuotes(u_address);
+            u_email = EscapeSingleQuotes(u_email);
+            u_card_name = EscapeSingleQuotes(u_card_name);
+            u_card_address = EscapeSingleQuotes(u_card_address);
+            u_card_exp = EscapeSingleQuotes(u_card_exp);
 
-                std::cout << "\nUS address ([Street Address or P.O. Box], [City], [State] [ZIP Code]):\n";
-                std::getline(std::cin, u_address);
+            // Generate a unique random User ID
+            int user_id;
+            bool is_unique = false;
+            int attempts = 0;
+            const int MAX_ATTEMPTS = 1000;
 
-                std::cout << "\nEmail: ";
-                std::cin >> u_email;
-                std::cin.ignore();
+            while (!is_unique && attempts < MAX_ATTEMPTS)
+            {                                   // while //
+                user_id = rand() % 9000 + 1000; // Generates a number between 1000 and 9999
+                std::string check_query = "SELECT 1 FROM USER WHERE UserID = " + std::to_string(user_id) + " LIMIT 1;";
 
-                std::cout << "\nPhone (no spaces or parentheses - ex: 1234567890): ";
-                std::cin >> u_phone;
-                std::cin.ignore();
+                bool exists = false;
 
-                std::cout << "\nPassword: ";
-                std::cin >> u_password;
-                std::cin.ignore();
-                std::cout << "\nConfirm password: ";
-                std::cin >> u_password_confirm;
-                std::cin.ignore();
+                // Callback to set exists flag
+                auto exists_callback = [](void *data, int argc, char **argv, char **azColName) -> int
+                {
+                    bool *exists_ptr = static_cast<bool *>(data);
+                    *exists_ptr = true;
+                    return 0;
+                };
 
-                if(u_password != u_password_confirm)
+                rc = sqlite3_exec(db, check_query.c_str(), exists_callback, &exists, &zErrMsg);
+                if (rc != SQLITE_OK)
                 { // if //
-                    std::cout << "Passwords do not match. Please rerun and try again.\n";
+                    std::cerr << "SQL error during UserID check: " << zErrMsg << std::endl;
+                    sqlite3_free(zErrMsg);
                     break;
                 } // if //
 
-                // manually free / delete u_password_confim for security reasons
-                u_password_confirm.clear();
-                u_password_confirm.shrink_to_fit();
+                if (!exists)
+                {
+                    is_unique = true;
+                }
 
-                // User payment info
-                std::cout << "\nYou will now enter your payment info:\n";
-                std::cout << "\nPlease enter your card # (no spaces or symbols between numbers): ";
-                std::cin >> u_card_number;
+                attempts++;
+            } // while //
+
+            if (!is_unique)
+            { // if //
+                std::cerr << "Failed to generate a unique User ID after " << MAX_ATTEMPTS << " attempts." << std::endl;
+                sqlite3_close(db);
+                return 1;
+            } // if //
+
+            std::cout << "Assigned User ID: " << user_id << std::endl;
+
+            // Build the SQL INSERT statement using sqlite3_mprintf to prevent SQL injection
+            char *sql_insert_user = sqlite3_mprintf(
+                "INSERT INTO USER (UserID, FirstName, LastName, Address, Email, Phone, PaymentInfo, PlanID, Password) "
+                "VALUES (%d, '%q', '%q', '%q', '%q', '%q', '%q', %d, '%q');",
+                user_id,
+                u_first.c_str(), u_last.c_str(), u_address.c_str(), u_email.c_str(), u_phone.c_str(),
+                u_payment_info.c_str(),
+                u_plan_choice,
+                u_password.c_str());
+
+            // Execute the SQL statement
+            rc = sqlite3_exec(db, sql_insert_user, nullptr, 0, &zErrMsg);
+            if (rc != SQLITE_OK)
+            { // if //
+                std::cerr << "SQL error: " << zErrMsg << std::endl;
+                sqlite3_free(zErrMsg);
+            } // if //
+            else
+            {
+                std::cout << "New user added successfully with User ID: " << user_id << ".\n";
+            }
+
+            // Free the memory allocated by sqlite3_mprintf
+            sqlite3_free(sql_insert_user);
+            break;
+        } // case 1 //
+
+        case 2:
+        { // case 2 //
+            // prompt and get the choice
+            std::cout << remove_by_prompt << std::endl;
+            std::cin >> r;
+            std::cin.ignore();
+
+            switch (r)
+            { // s //
+            case 1:
+            { // case 1 //
+                std::cout << "Enter the email of the user you wish to remove: ";
+                std::cin >> r_email;
                 std::cin.ignore();
-
-                std::cout << "\nPlease enter the name on the card:\n";
-                std::getline(std::cin, u_card_name);
-
-                std::cout << "\nUS billing address ([Street Address or P.O. Box], [City], [State] [ZIP Code]):\n";
-                std::getline(std::cin, u_card_address);
-
-                std::cout << "\nExpiration date ([Month]/[Year - 4 digits] - ex: 10/2024): ";
-                std::cin >> u_card_exp;
+                rc = sqlite3_exec(db, ("DELETE FROM USER WHERE Email = '" + r_email + "';").c_str(), callback, 0, &zErrMsg);
+                if (rc != SQLITE_OK)
+                { // i //
+                    std::cerr << "SQL error: " << zErrMsg << std::endl;
+                    sqlite3_free(zErrMsg);
+                } // i //
+                else
+                {
+                    std::cout << "User removed successfully.\n";
+                }
+                break;
+            } // case 1 //
+            case 2:
+            { // case 2 //
+                std::cout << "Enter the phone number of the user you wish to remove: ";
+                std::cin >> r_phone;
                 std::cin.ignore();
-
-                std::cout << "\nCVV: ";
-                std::cin >> u_card_cvv;
+                rc = sqlite3_exec(db, ("DELETE FROM USER WHERE Phone = '" + r_phone + "';").c_str(), callback, 0, &zErrMsg);
+                if (rc != SQLITE_OK)
+                { // i //
+                    std::cerr << "SQL error: " << zErrMsg << std::endl;
+                    sqlite3_free(zErrMsg);
+                } // i //
+                else
+                {
+                    std::cout << "User removed successfully.\n";
+                }
+                break;
+            } // case 2 //
+            case 3:
+            { // case 3 //
+                std::cout << "Enter the address of the user you wish to remove: ";
+                std::cin >> r_id;
                 std::cin.ignore();
-
-                // Combine payment info
-                std::string u_payment_info = u_card_number + "," + u_card_name + "," + u_card_address + "," + u_card_exp + "," + std::to_string(u_card_cvv);
-
-                // Display available plans
-                std::cout << "\nHere are the following plan options:\n";
-                rc = sqlite3_exec(db, "SELECT PlanID, Name, Price, Calories, Frequency, NumberOfMeals FROM PLAN;", callback, 0, &zErrMsg);
-
-                if(rc != SQLITE_OK)
+                rc = sqlite3_exec(db, ("DELETE FROM USER WHERE Address = '" + r_address + "';").c_str(), callback, 0, &zErrMsg);
+                if (rc != SQLITE_OK)
                 { // if //
                     std::cerr << "SQL error: " << zErrMsg << std::endl;
                     sqlite3_free(zErrMsg);
-                    sqlite3_close(db);
-                    return 1;
-                } // if //
-                else { std::cout << "Available plans displayed above.\n"; } 
-
-                std::cout << "Enter the Plan ID you choose: ";
-                std::cin >> u_plan_choice;
+                } // i //
+                else
+                {
+                    std::cout << "User removed successfully.\n";
+                }
+                break;
+            } // case 3 //
+            case 4:
+            { // case 4 //
+                std::cout << "Enter the User ID of the user you wish to remove: ";
+                std::cin >> r_id;
                 std::cin.ignore();
-
-                // Escape single quotes in user inputs
-                u_first = EscapeSingleQuotes(u_first);
-                u_last = EscapeSingleQuotes(u_last);
-                u_address = EscapeSingleQuotes(u_address);
-                u_email = EscapeSingleQuotes(u_email);
-                u_card_name = EscapeSingleQuotes(u_card_name);
-                u_card_address = EscapeSingleQuotes(u_card_address);
-                u_card_exp = EscapeSingleQuotes(u_card_exp);
-
-                // Generate a unique random User ID
-                int user_id;
-                bool is_unique = false;
-                int attempts = 0;
-                const int MAX_ATTEMPTS = 1000;
-
-                while(!is_unique && attempts < MAX_ATTEMPTS)
-                { // while //
-                    user_id = rand() % 9000 + 1000; // Generates a number between 1000 and 9999
-                    std::string check_query = "SELECT 1 FROM USER WHERE UserID = " + std::to_string(user_id) + " LIMIT 1;";
-                    
-                    bool exists = false;
-
-                    // Callback to set exists flag
-                    auto exists_callback = [](void* data, int argc, char** argv, char** azColName) -> int {
-                        bool* exists_ptr = static_cast<bool*>(data);
-                        *exists_ptr = true;
-                        return 0;
-                    };
-
-                    rc = sqlite3_exec(db, check_query.c_str(), exists_callback, &exists, &zErrMsg);
-                    if(rc != SQLITE_OK)
-                    { // if //
-                        std::cerr << "SQL error during UserID check: " << zErrMsg << std::endl;
-                        sqlite3_free(zErrMsg);
-                        break;
-                    } // if //
-
-                    if(!exists) { is_unique = true; }
-
-                    attempts++;
-                } // while //
-
-                if(!is_unique)
-                { // if //
-                    std::cerr << "Failed to generate a unique User ID after " << MAX_ATTEMPTS << " attempts." << std::endl;
-                    sqlite3_close(db);
-                    return 1;
-                } // if //
-
-                std::cout << "Assigned User ID: " << user_id << std::endl;
-
-                // Build the SQL INSERT statement using sqlite3_mprintf to prevent SQL injection
-                char* sql_insert_user = sqlite3_mprintf(
-                    "INSERT INTO USER (UserID, FirstName, LastName, Address, Email, Phone, PaymentInfo, PlanID, Password) "
-                    "VALUES (%d, '%q', '%q', '%q', '%q', '%q', '%q', %d, '%q');",
-                    user_id,
-                    u_first.c_str(), u_last.c_str(), u_address.c_str(), u_email.c_str(), u_phone.c_str(),
-                    u_payment_info.c_str(),
-                    u_plan_choice,
-                    u_password.c_str()
-                );
-            
-                // Execute the SQL statement
-                rc = sqlite3_exec(db, sql_insert_user, nullptr, 0, &zErrMsg);
-                if(rc != SQLITE_OK)
+                rc = sqlite3_exec(db, ("DELETE FROM USER WHERE UserID = " + std::to_string(r_id) + ";").c_str(), callback, 0, &zErrMsg);
+                if (rc != SQLITE_OK)
                 { // if //
                     std::cerr << "SQL error: " << zErrMsg << std::endl;
-                    sqlite3_free(zErrMsg);            
-                } // if //
-                else { std::cout << "New user added successfully with User ID: " << user_id << ".\n"; }
-
-                // Free the memory allocated by sqlite3_mprintf
-                sqlite3_free(sql_insert_user);
+                    sqlite3_free(zErrMsg);
+                } // i //
+                else
+                {
+                    std::cout << "User removed successfully.\n";
+                }
                 break;
-            } // case 1 //
+            } // case 4 //
 
-            case 2:
-            { // case 2 //
-                // prompt and get the choice 
-                std::cout << remove_by_prompt << std::endl;
-                std::cin >> r;
-                std::cin.ignore();
-
-                switch(r)
-                { // s //
-                    case 1:
-                    { // case 1 //
-                        std::cout << "Enter the email of the user you wish to remove: ";
-                        std::cin >> r_email;
-                        std::cin.ignore();
-                        rc = sqlite3_exec(db, ("DELETE FROM USER WHERE Email = '" + r_email + "';").c_str(), callback, 0, &zErrMsg);
-                        if(rc != SQLITE_OK)
-                        { // i //
-                            std::cerr << "SQL error: " << zErrMsg << std::endl;
-                            sqlite3_free(zErrMsg);
-                        } // i //
-                        else { std::cout << "User removed successfully.\n"; }
-                        break;
-                    } // case 1 //
-                    case 2:
-                    { // case 2 //
-                        std::cout << "Enter the phone number of the user you wish to remove: ";
-                        std::cin >> r_phone;
-                        std::cin.ignore();
-                        rc = sqlite3_exec(db, ("DELETE FROM USER WHERE Phone = '" + r_phone + "';").c_str(), callback, 0, &zErrMsg);
-                        if(rc != SQLITE_OK)
-                        { // i //
-                            std::cerr << "SQL error: " << zErrMsg << std::endl;
-                            sqlite3_free(zErrMsg);
-                        } // i //
-                        else { std::cout << "User removed successfully.\n"; }
-                        break;
-                    } // case 2 //
-                    case 3:
-                    { // case 3 //
-                        std::cout << "Enter the address of the user you wish to remove: ";
-                        std::cin >> r_id;
-                        std::cin.ignore();
-                        rc = sqlite3_exec(db, ("DELETE FROM USER WHERE Address = '" + r_address + "';").c_str(), callback, 0, &zErrMsg);
-                        if(rc != SQLITE_OK)
-                        { // if //
-                            std::cerr << "SQL error: " << zErrMsg << std::endl;
-                            sqlite3_free(zErrMsg);
-                        } // i //
-                        else { std::cout << "User removed successfully.\n"; }
-                        break;
-                    } // case 3 //
-                    case 4:
-                    { // case 4 //
-                        std::cout << "Enter the User ID of the user you wish to remove: ";
-                        std::cin >> r_id;
-                        std::cin.ignore();
-                        rc = sqlite3_exec(db, ("DELETE FROM USER WHERE UserID = " + std::to_string(r_id) + ";").c_str(), callback, 0, &zErrMsg);
-                        if(rc != SQLITE_OK)
-                        { // if //
-                            std::cerr << "SQL error: " << zErrMsg << std::endl;
-                            sqlite3_free(zErrMsg);
-                        } // i //
-                        else { std::cout << "User removed successfully.\n"; }
-                        break;
-                    } // case 4 //
-
-                    default:
-                    { // default //
-                        std::cout << "You entered an invalid choice. Please rerun and try again.\n";
-                        break;
-                    } // default //
-                } // s //
+            default:
+            { // default //
+                std::cout << "You entered an invalid choice. Please rerun and try again.\n";
                 break;
-            } // case 2 //
-          case 3:
-          { // case 3 //
+            } // default //
+            } // s //
+            break;
+        } // case 2 //
+        case 3:
+        { // case 3 //
             std::cout << edit_subscription << std::endl;
             std::cin >> r;
             std::cin.ignore();
@@ -389,7 +413,92 @@ Press 2 to cancel subscription.
         case 4:
         { // case 4 //
             // Implementation for option 4
-            std::cout << "Feature not implemented yet.\n";
+            std::cout << "First and last name ([FirstName] [LastName]): ";
+            std::cin >> d_first >> d_last;
+            std::cin.ignore();
+
+            std::cout << "Zipcode: ";
+            std::cin >> d_zip;
+
+            std::cout << "Enter starting rate per mile: ";
+            std::cin >> d_rate;
+
+            d_tips = 0.00; // initialize starting tips and miles to zero
+            d_miles = 0.00;
+
+            // Escape single quotes in user inputs
+            d_first = EscapeSingleQuotes(u_first);
+            d_last = EscapeSingleQuotes(u_last);
+
+            // Generate a unique random User ID
+            int driver_id;
+            bool is_unique = false;
+            int attempts = 0;
+            const int MAX_ATTEMPTS = 1000;
+
+            while (!is_unique && attempts < MAX_ATTEMPTS)
+            {                                     // while //
+                driver_id = rand() % 9000 + 1000; // Generates a number between 1000 and 9999
+                std::string check_query = "SELECT 1 FROM DRIVER WHERE DriverID = " + std::to_string(driver_id) + " LIMIT 1;";
+
+                bool exists = false;
+
+                // Callback to set exists flag
+                auto exists_callback = [](void *data, int argc, char **argv, char **azColName) -> int
+                {
+                    bool *exists_ptr = static_cast<bool *>(data);
+                    *exists_ptr = true;
+                    return 0;
+                };
+
+                rc = sqlite3_exec(db, check_query.c_str(), exists_callback, &exists, &zErrMsg);
+                if (rc != SQLITE_OK)
+                { // if //
+                    std::cerr << "SQL error during DriverID check: " << zErrMsg << std::endl;
+                    sqlite3_free(zErrMsg);
+                    break;
+                } // if //
+
+                if (!exists)
+                {
+                    is_unique = true;
+                }
+
+                attempts++;
+            } // while //
+
+            if (!is_unique)
+            { // if //
+                std::cerr << "Failed to generate a unique Driver ID after " << MAX_ATTEMPTS << " attempts." << std::endl;
+                sqlite3_close(db);
+                return 1;
+            } // if //
+
+            std::cout << "Assigned Driver ID: " << driver_id << std::endl;
+
+            // Build the SQL INSERT statement using sqlite3_mprintf to prevent SQL injection
+            char *sql_insert_driver = sqlite3_mprintf(
+                "INSERT INTO DRIVER (DriverID, FirstName, LastName, ZipCode, RatePerMile, SumOfTips, SumOfMiles) "
+                "VALUES (%d, '%q', '%q', %d, %.2f, %.2f, %.2f);",
+                driver_id,
+                d_first.c_str(), d_last.c_str(),
+                d_zip, d_rate, d_tips, d_miles);
+
+            // Execute the SQL statement
+            rc = sqlite3_exec(db, sql_insert_driver, nullptr, 0, &zErrMsg);
+            if (rc != SQLITE_OK)
+            { // if //
+                std::cerr << "SQL error: " << zErrMsg << std::endl;
+                sqlite3_free(zErrMsg);
+            } // if //
+            else
+            {
+                std::cout << "New driver added successfully with Driver ID: " << driver_id << ".\n";
+            }
+
+            // Free the memory allocated by sqlite3_mprintf
+            sqlite3_free(sql_insert_driver);
+
             break;
         } // case 4 //
         case 5:
