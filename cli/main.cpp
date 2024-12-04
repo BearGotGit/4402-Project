@@ -94,8 +94,8 @@ int main(int argc, char *argv[])
 Press 0 to exit the program [done - Zach].
 Press 1 to sign up [done - Zach].
 Press 2 to delete your account and all your data [done - Zach].
-Press 3 to change or cancel your subscription [- Bayla].
-Press 4 to sign up to be a driver [working - josh].
+Press 3 to change or cancel your subscription [in progress - Bayla].
+Press 4 to sign up to be a driver [done - josh].
 Press 5 to [].
 Press 6 to enter SQL queries directly [done - Zach].
 )";
@@ -644,7 +644,7 @@ Or press the subscription number you would like to change to.
             } // if //
             else
             {
-                std::cout << "New driver added successfully with Driver ID: " << driver_id << ".\n";
+                std::cout << "Congrats on joining our team! Your Driver ID is: " << driver_id << ".\n";
             }
 
             // Free the memory allocated by sqlite3_mprintf
