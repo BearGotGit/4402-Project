@@ -20,6 +20,14 @@ static int callback(void *NotUsed, int argc, char **argv, char **azColName)
     return 0;
 } // callback //
 
+// Callback to set exists flag
+auto exists_callback = [](void *data, int argc, char **argv, char **azColName) -> int
+{
+    bool *exists_ptr = static_cast<bool *>(data);
+    *exists_ptr = true;
+    return 0;
+};
+
 // Function to escape single quotes in strings (due to SQL syntax requirements)
 
 std::string EscapeSingleQuotes(const std::string &str)
@@ -125,8 +133,23 @@ Press 4 to remove by your user ID.
             R"(
 Press 1 to change subscription.
 Press 2 to cancel subscription.
+)"; 
+        std::string identify_user_for_subscription = R"(
+Press 1 to indentify by your email.
+Press 2 to indentify by your phone number.
+Press 3 to indentify by your address.
+Press 4 to indentify by your User ID.
 )";
 
+        std::string remove_or_update_subscription_prompt = R"(
+Press 0 to remove your subscription.
+Or press the subscription number you would like to change to.
+)";
+
+        std::string u_plan; // the user plan they chose when they signed up
+        int u_plan_id, u_plan_subscription_choice;
+
+        // Case 4 Variables //
         std::string d_first, d_last;
         int d_zip;
         float d_rate, d_tips, d_miles;
@@ -141,14 +164,14 @@ Press 2 to cancel subscription.
 
         switch (n)
         { // switch //
-        case 0:
+        case 0: // EXIT PROGRAM
         { // case 0 //
             std::cout << "Exiting program." << std::endl;
             sqlite3_close(db);
             return 0;
         } // case 0 //
 
-        case 1:
+        case 1: // SIGN UP USER
         { // case 1 //
             std::cout << "Thanks for signing up! Please enter the following info as prompted:\n";
 
@@ -310,7 +333,7 @@ Press 2 to cancel subscription.
             break;
         } // case 1 //
 
-        case 2:
+        case 2: // REMOVE A USER
         { // case 2 //
             // prompt and get the choice
             std::cout << remove_by_prompt << std::endl;
@@ -324,6 +347,23 @@ Press 2 to cancel subscription.
                 std::cout << "Enter the email of the user you wish to remove: ";
                 std::cin >> r_email;
                 std::cin.ignore();
+
+
+                // Escape single quotes in user inputs
+                r_email = EscapeSingleQuotes(r_email);
+
+                // Check if the email even exists
+                std::string check_query = "SELECT 1 FROM USER WHERE Email = '" + r_email + "' LIMIT 1;";
+                bool exists = false;
+
+                rc = sqlite3_exec(db, check_query.c_str(), exists_callback, &exists, &zErrMsg);
+
+                if (!exists)
+                {
+                    std::cout << "Email does not exist. Please rerun and try again.\n";
+                    break;
+                }
+
                 rc = sqlite3_exec(db, ("DELETE FROM USER WHERE Email = '" + r_email + "';").c_str(), callback, 0, &zErrMsg);
                 if (rc != SQLITE_OK)
                 { // i //
@@ -341,6 +381,22 @@ Press 2 to cancel subscription.
                 std::cout << "Enter the phone number of the user you wish to remove: ";
                 std::cin >> r_phone;
                 std::cin.ignore();
+
+                // Escape single quotes in user inputs
+                r_phone = EscapeSingleQuotes(r_phone);
+
+                // Check if the phone even exists
+                std::string check_query = "SELECT 1 FROM USER WHERE Phone = '" + r_phone + "' LIMIT 1;";
+                bool exists = false;
+
+                rc = sqlite3_exec(db, check_query.c_str(), exists_callback, &exists, &zErrMsg);
+
+                if (!exists)
+                {
+                    std::cout << "Phone does not exist. Please rerun and try again.\n";
+                    break;
+                }
+
                 rc = sqlite3_exec(db, ("DELETE FROM USER WHERE Phone = '" + r_phone + "';").c_str(), callback, 0, &zErrMsg);
                 if (rc != SQLITE_OK)
                 { // i //
@@ -356,8 +412,24 @@ Press 2 to cancel subscription.
             case 3:
             { // case 3 //
                 std::cout << "Enter the address of the user you wish to remove: ";
-                std::cin >> r_id;
+                std::cin >> r_address;
                 std::cin.ignore();
+
+                // Escape single quotes in user inputs
+                r_address = EscapeSingleQuotes(r_address);
+
+                // Check if the address even exists
+                std::string check_query = "SELECT 1 FROM USER WHERE Address = '" + r_address + "' LIMIT 1;";
+                bool exists = false;
+                rc = sqlite3_exec(db, check_query.c_str(), exists_callback, &exists, &zErrMsg);
+
+                if (!exists)
+                {
+                    std::cout << "Address does not exist. Please rerun and try again.\n";
+                    break;
+                }
+
+                // Assuming address exists, now delete the user
                 rc = sqlite3_exec(db, ("DELETE FROM USER WHERE Address = '" + r_address + "';").c_str(), callback, 0, &zErrMsg);
                 if (rc != SQLITE_OK)
                 { // if //
@@ -375,19 +447,28 @@ Press 2 to cancel subscription.
                 std::cout << "Enter the User ID of the user you wish to remove: ";
                 std::cin >> r_id;
                 std::cin.ignore();
+
+                // Check if the User ID even exists
+                std::string check_query = "SELECT 1 FROM USER WHERE UserID = " + std::to_string(r_id) + " LIMIT 1;";
+                bool exists = false;
+                rc = sqlite3_exec(db, check_query.c_str(), exists_callback, &exists, &zErrMsg);
+
+                if (!exists)
+                {
+                    std::cout << "User ID does not exist. Please rerun and try again.\n";
+                    break;
+                }
+
+                // Assuming the user ID does exist...
                 rc = sqlite3_exec(db, ("DELETE FROM USER WHERE UserID = " + std::to_string(r_id) + ";").c_str(), callback, 0, &zErrMsg);
                 if (rc != SQLITE_OK)
                 { // if //
                     std::cerr << "SQL error: " << zErrMsg << std::endl;
                     sqlite3_free(zErrMsg);
                 } // i //
-                else
-                {
-                    std::cout << "User removed successfully.\n";
-                }
+                else { std::cout << "User removed successfully.\n"; }
                 break;
             } // case 4 //
-
             default:
             { // default //
                 std::cout << "You entered an invalid choice. Please rerun and try again.\n";
@@ -396,18 +477,88 @@ Press 2 to cancel subscription.
             } // s //
             break;
         } // case 2 //
-        case 3:
+        case 3: // CHANGE OR EDIT THE SUBSCRIPTION 
         { // case 3 //
-            std::cout << edit_subscription << std::endl;
+            // prompt user to choose first how to idenntify themselves
+            std::cout << identify_user_for_subscription << std::endl;
             std::cin >> r;
             std::cin.ignore();
-            // Implementation for option 3
-            if (u_password != u_password_confirm)
-            { // if //
-                std::cout << "Passwords do not match. Please rerun and try again.\n";
+
+            // Identify the user
+            switch (r)
+            { // s //
+            case 1: // BY EMAIL
+            { // case 1 //
+                std::cout << "Enter the email of the user you wish to change or edit the subscription for: ";
+                std::cin >> u_email;
+                std::cin.ignore(); // ignore / consume the leftover newline character
+
+                // Escape single quotes in user inputs
+                u_email = EscapeSingleQuotes(u_email);
+
+                // Check if the email even exists 
+                std::string check_query = "SELECT 1 FROM USER WHERE Email = '" + u_email + "' LIMIT 1;";
+                bool exists = false;
+                rc = sqlite3_exec(db, check_query.c_str(), exists_callback, &exists, &zErrMsg);
+
+                if (!exists)
+                { std::cout << "Email does not exist. Please rerun and try again.\n"; break; }
+
+                // output all the plans
+                std::cout << "Here are the following plan options:\n";
+                rc = sqlite3_exec(db, "SELECT PlanID, Name, Price, Calories, Frequency, NumberOfMeals FROM PLAN;", callback, 0, &zErrMsg);
+                std::cout << "\nYour current plan is: \n";
+
+                // Get the users current plan 
+                std::string get_plan_query = "SELECT PlanID FROM PLAN WHERE PlanID = (SELECT PlanID FROM USER WHERE Email = '" + u_email + "');";
+                rc = sqlite3_exec(db, get_plan_query.c_str(), callback, 0, &zErrMsg);
+
+                // Prompt user
+                std::cout << remove_or_update_subscription_prompt << std::endl;
+
+                std::cin >> u_plan_subscription_choice;
+
+                if (u_plan_subscription_choice == 0)
+                {
+                    std::string remove_query = "DELETE FROM USER WHERE Email = '" + u_email + "';";
+                    rc = sqlite3_exec(db, remove_query.c_str(), callback, 0, &zErrMsg);
+                    if (rc != SQLITE_OK)
+                    { std::cerr << "SQL error: " << zErrMsg << std::endl; sqlite3_free(zErrMsg); }
+                    else { std::cout << "Subscription removed successfully.\n"; }
+                }
+                else
+                {
+                    // update the subscription
+                    std::string update_query = "UPDATE USER SET PlanID = " + std::to_string(u_plan_subscription_choice) + " WHERE Email = '" + u_email + "';";
+                    rc = sqlite3_exec(db, update_query.c_str(), callback, 0, &zErrMsg);
+                    if (rc != SQLITE_OK) { std::cerr << "SQL error: " << zErrMsg << std::endl; sqlite3_free(zErrMsg); }
+                    else { std::cout << "Subscription updated successfully.\n"; }
+                }
+
                 break;
-            }
-            std::cout << "Feature not implemented yet.\n";
+            } // case 1 //
+            case 2: // IDENTIFY USER BY PHONE NUMBER
+            { // case 2 //
+
+                // 
+                break;
+            } // case 2 //
+            case 3: // IDENTIFY USER BY ADDRESS
+            { // case 3 //
+                break;
+            } // case 3 //
+            case 4: // IDENTIFY USER BY USER ID
+            { // case 4 //
+                break;
+            } // case 4 //
+            default:
+            { // default //
+                std::cout << "You entered an invalid choice. Please rerun and try again.\n";
+                break;
+            } // default //
+            } // s //
+
+
             break;
         } // case 3 //
         case 4:
