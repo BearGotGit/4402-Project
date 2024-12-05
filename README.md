@@ -54,4 +54,6 @@ in `main.cpp` and then recompile & run the program.
 
 4. SELECT d.FirstName FROM Driver d JOIN User u ON d.FirstName = u.FirstName WHERE d.RatePerMile > 2.75;
 
-5. 
+5. INSERT INTO ADDRESS (Country, City, State, ZipCode, UserID)  VALUES  ('USA', 'BTR', 'LA', 70802, 100),  ('USA', 'BTR', 'LA', 70802, 200);
+
+6. SELECT u.FirstName, u.LastName, u.address, a.city, a.state, a.zipcode, a.country FROM address a JOIN user u ON a.UserID = u.UserID WHERE u.FirstName = 'Mahmood';
