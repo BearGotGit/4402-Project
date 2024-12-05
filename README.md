@@ -42,8 +42,7 @@ in `main.cpp` and then recompile & run the program.
 
 ## Authors
 
-- Example project for class created by Sadie Forbes
-- {Zach James, Berend Brandt, Shalvi, Joshua Pugh, Steven Reed [Fill your name here]()}
+- {Zach James, Berend Brandt, Shalvi Dalal, Joshua Pugh, Steven Reed, Justin Coupel, Bayla Patin}
 
 ## Test Queries
 
@@ -51,3 +50,8 @@ in `main.cpp` and then recompile & run the program.
 
 2. SELECT Password FROM user WHERE FirstName = 'Mahmood' AND LastName = 'Jasim';
 
+3.
+
+4.
+
+5. 
