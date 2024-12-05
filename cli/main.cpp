@@ -141,7 +141,6 @@ Press 2 to cancel subscription.
         std::string identify_user_for_subscription = R"(
 Press 1 to indentify by your email.
 Press 2 to indentify by your phone number.
-Press 3 to indentify by your User ID.
 )";
 
         std::string remove_or_update_subscription_prompt = R"(
@@ -564,10 +563,6 @@ Or press the subscription number you would like to change to.
 
                 break;
             } // case 2 //
-            case 3: // IDENTIFY USER BY USER ID
-            {       // case 4 //
-                break;
-            } // case 4 //
             default:
             { // default //
                 std::cout << "You entered an invalid choice. Please rerun and try again.\n";
