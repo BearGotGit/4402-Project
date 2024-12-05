@@ -49,4 +49,5 @@ in `main.cpp` and then recompile & run the program.
 
 1. INSERT INTO USER (Phone, Email, Password, FirstName, LastName, Address, PlanID, PaymentInfo) VALUES ('2255784474', 'mjasim@lsu.edu', 'somereallybadpassword', 'Mahmood', 'Jasim', '3209G Patrick F Taylor Building', 1, 'Visa **** 1111'), ('2255782624', 'goldenrichard1@lsu.edu', 'somereallygoodpassword', 'Golden', 'Richard', '1081A Digital Media Center', 2, 'Mastercard **** 2222');
 
-2.
+2. SELECT Password FROM user WHERE FirstName = 'Mahmood' AND LastName = 'Jasim';
+
