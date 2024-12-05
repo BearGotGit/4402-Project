@@ -1,0 +1,14 @@
+4
+Joe Burrow
+70737
+20.44
+
+4
+Major Burns
+70769
+13.99
+
+6
+select DriverID, FirstName, LastName, ZipCode, RatePerMile, SumOfTips, SumOfMiles from DRIVER
+exit
+0
