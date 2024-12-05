@@ -1,0 +1,12 @@
+2
+1
+mtiger@lsu.edu
+
+2
+2
+2251112222
+
+6 
+select UserID, Phone, Email, FirstName, LastName, Address, PlanID, PaymentInfo from user;
+exit
+0

@@ -141,7 +141,8 @@ Press 2 to cancel subscription.
         std::string identify_user_for_subscription = R"(
 Press 1 to indentify by your email.
 Press 2 to indentify by your phone number.
-Press 3 to indentify by your User ID.
+Press 3 to indentify by your address.
+Press 4 to indentify by your User ID.
 )";
 
         std::string remove_or_update_subscription_prompt = R"(
@@ -562,9 +563,14 @@ Or press the subscription number you would like to change to.
             case 2: // IDENTIFY USER BY PHONE NUMBER
             {       // case 2 //
 
+                //
                 break;
             } // case 2 //
-            case 3: // IDENTIFY USER BY USER ID
+            case 3: // IDENTIFY USER BY ADDRESS
+            {       // case 3 //
+                break;
+            } // case 3 //
+            case 4: // IDENTIFY USER BY USER ID
             {       // case 4 //
                 break;
             } // case 4 //
