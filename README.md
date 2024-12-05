@@ -24,8 +24,8 @@ For sqlite3:
 ## CLI Notes
 
 To compile & run:
-`clang++ main.cpp -o m -lsqlite3` or
-`g++ main.cpp -o m -lsqlite3`
+`clang++ -std=c++11 main.cpp -o m -lsqlite3` or
+`g++ -std=c++11 main.cpp -o m -lsqlite3`
 then run `./m`
 
 The main file sets up the database, setting up the table with 'schema_setup.sql' and populating the table with 'data_population.sql'.

@@ -137,12 +137,11 @@ Press 4 to remove by your user ID.
             R"(
 Press 1 to change subscription.
 Press 2 to cancel subscription.
-)"; 
+)";
         std::string identify_user_for_subscription = R"(
 Press 1 to indentify by your email.
 Press 2 to indentify by your phone number.
-Press 3 to indentify by your address.
-Press 4 to indentify by your User ID.
+Press 3 to indentify by your User ID.
 )";
 
         std::string remove_or_update_subscription_prompt = R"(
@@ -168,16 +167,16 @@ Or press the subscription number you would like to change to.
         // Case 5 Variables //
 
         switch (n)
-        { // switch //
+        {       // switch //
         case 0: // EXIT PROGRAM
-        { // case 0 //
+        {       // case 0 //
             std::cout << "Exiting program." << std::endl;
             sqlite3_close(db);
             return 0;
         } // case 0 //
 
         case 1: // SIGN UP USER
-        { // case 1 //
+        {       // case 1 //
             std::cout << "Thanks for signing up! Please enter the following info as prompted:\n";
 
             // User info
@@ -339,7 +338,7 @@ Or press the subscription number you would like to change to.
         } // case 1 //
 
         case 2: // REMOVE A USER
-        { // case 2 //
+        {       // case 2 //
             // prompt and get the choice
             std::cout << remove_by_prompt << std::endl;
             std::cin >> r;
@@ -352,7 +351,6 @@ Or press the subscription number you would like to change to.
                 std::cout << "Enter the email of the user you wish to remove: ";
                 std::cin >> r_email;
                 std::cin.ignore();
-
 
                 // Escape single quotes in user inputs
                 r_email = EscapeSingleQuotes(r_email);
@@ -471,7 +469,10 @@ Or press the subscription number you would like to change to.
                     std::cerr << "SQL error: " << zErrMsg << std::endl;
                     sqlite3_free(zErrMsg);
                 } // i //
-                else { std::cout << "User removed successfully.\n"; }
+                else
+                {
+                    std::cout << "User removed successfully.\n";
+                }
                 break;
             } // case 4 //
             default:
@@ -482,8 +483,8 @@ Or press the subscription number you would like to change to.
             } // s //
             break;
         } // case 2 //
-        case 3: // CHANGE OR EDIT THE SUBSCRIPTION 
-        { // case 3 //
+        case 3: // CHANGE OR EDIT THE SUBSCRIPTION
+        {       // case 3 //
             // prompt user to choose first how to idenntify themselves
             std::cout << identify_user_for_subscription << std::endl;
             std::cin >> r;
@@ -491,9 +492,9 @@ Or press the subscription number you would like to change to.
 
             // Identify the user
             switch (r)
-            { // s //
+            {       // s //
             case 1: // BY EMAIL
-            { // case 1 //
+            {       // case 1 //
                 std::cout << "Enter the email of the user you wish to change or edit the subscription for: ";
                 std::cin >> u_email;
                 std::cin.ignore(); // ignore / consume the leftover newline character
@@ -501,20 +502,23 @@ Or press the subscription number you would like to change to.
                 // Escape single quotes in user inputs
                 u_email = EscapeSingleQuotes(u_email);
 
-                // Check if the email even exists 
+                // Check if the email even exists
                 std::string check_query = "SELECT 1 FROM USER WHERE Email = '" + u_email + "' LIMIT 1;";
                 bool exists = false;
                 rc = sqlite3_exec(db, check_query.c_str(), exists_callback, &exists, &zErrMsg);
 
                 if (!exists)
-                { std::cout << "Email does not exist. Please rerun and try again.\n"; break; }
+                {
+                    std::cout << "Email does not exist. Please rerun and try again.\n";
+                    break;
+                }
 
                 // output all the plans
                 std::cout << "Here are the following plan options:\n";
                 rc = sqlite3_exec(db, "SELECT PlanID, Name, Price, Calories, Frequency, NumberOfMeals FROM PLAN;", callback, 0, &zErrMsg);
                 std::cout << "\nYour current plan is: \n";
 
-                // Get the users current plan 
+                // Get the users current plan
                 std::string get_plan_query = "SELECT PlanID FROM PLAN WHERE PlanID = (SELECT PlanID FROM USER WHERE Email = '" + u_email + "');";
                 rc = sqlite3_exec(db, get_plan_query.c_str(), callback, 0, &zErrMsg);
 
@@ -528,32 +532,40 @@ Or press the subscription number you would like to change to.
                     std::string remove_query = "DELETE FROM USER WHERE Email = '" + u_email + "';";
                     rc = sqlite3_exec(db, remove_query.c_str(), callback, 0, &zErrMsg);
                     if (rc != SQLITE_OK)
-                    { std::cerr << "SQL error: " << zErrMsg << std::endl; sqlite3_free(zErrMsg); }
-                    else { std::cout << "Subscription removed successfully.\n"; }
+                    {
+                        std::cerr << "SQL error: " << zErrMsg << std::endl;
+                        sqlite3_free(zErrMsg);
+                    }
+                    else
+                    {
+                        std::cout << "Subscription removed successfully.\n";
+                    }
                 }
                 else
                 {
                     // update the subscription
                     std::string update_query = "UPDATE USER SET PlanID = " + std::to_string(u_plan_subscription_choice) + " WHERE Email = '" + u_email + "';";
                     rc = sqlite3_exec(db, update_query.c_str(), callback, 0, &zErrMsg);
-                    if (rc != SQLITE_OK) { std::cerr << "SQL error: " << zErrMsg << std::endl; sqlite3_free(zErrMsg); }
-                    else { std::cout << "Subscription updated successfully.\n"; }
+                    if (rc != SQLITE_OK)
+                    {
+                        std::cerr << "SQL error: " << zErrMsg << std::endl;
+                        sqlite3_free(zErrMsg);
+                    }
+                    else
+                    {
+                        std::cout << "Subscription updated successfully.\n";
+                    }
                 }
 
                 break;
             } // case 1 //
             case 2: // IDENTIFY USER BY PHONE NUMBER
-            { // case 2 //
+            {       // case 2 //
 
-                // 
                 break;
             } // case 2 //
-            case 3: // IDENTIFY USER BY ADDRESS
-            { // case 3 //
-                break;
-            } // case 3 //
-            case 4: // IDENTIFY USER BY USER ID
-            { // case 4 //
+            case 3: // IDENTIFY USER BY USER ID
+            {       // case 4 //
                 break;
             } // case 4 //
             default:
@@ -562,7 +574,6 @@ Or press the subscription number you would like to change to.
                 break;
             } // default //
             } // s //
-
 
             break;
         } // case 3 //
