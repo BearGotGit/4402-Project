@@ -50,8 +50,8 @@ in `main.cpp` and then recompile & run the program.
 
 2. SELECT Password FROM user WHERE FirstName = 'Mahmood' AND LastName = 'Jasim';
 
-3.
+3. INSERT INTO DRIVER (FirstName, LastName, ZipCode, RatePerMile, SumOfTips, SumOfMiles) VALUES ('Mahmood', 'Jasim', 70803, 3.00, 500.50, 5600), ('Golden', 'Richard', 43210, 2.75, 150.75, 2200);
 
-4.
+4. SELECT d.FirstName FROM Driver d JOIN User u ON d.FirstName = u.FirstName WHERE d.RatePerMile > 2.75;
 
 5. 
