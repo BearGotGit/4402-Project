@@ -39,4 +39,4 @@ in `main.cpp` and then recompile & run the program.
 ## Authors
 
 - Example project for class created by Sadie Forbes
-- {Zach James, Berend Brandt, Shalvi, [Fill your name here]()}
+- {Zach James, Berend Brandt, Shalvi, Joshua Pugh, [Fill your name here]()}

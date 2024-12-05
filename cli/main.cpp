@@ -149,12 +149,13 @@ Or press the subscription number you would like to change to.
         std::string u_plan; // the user plan they chose when they signed up
         int u_plan_id, u_plan_subscription_choice;
 
+        // Case 3 Variables //
+
         // Case 4 Variables //
+
         std::string d_first, d_last;
         int d_zip;
         float d_rate, d_tips, d_miles;
-
-        // Case 3 Variables //
 
         // Case 4 Variables //
         // Case 4 Variables //
@@ -578,8 +579,8 @@ Or press the subscription number you would like to change to.
             d_miles = 0.00;
 
             // Escape single quotes in user inputs
-            d_first = EscapeSingleQuotes(u_first);
-            d_last = EscapeSingleQuotes(u_last);
+            d_first = EscapeSingleQuotes(d_first);
+            d_last = EscapeSingleQuotes(d_last);
 
             // Generate a unique random User ID
             int driver_id;
