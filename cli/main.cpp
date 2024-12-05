@@ -95,13 +95,13 @@ int main(int argc, char *argv[])
         // The options to prompt the user with ( Team members: please write whatever you will do and then implement it below )
         std::string prompt =
             R"(
-Press 0 to exit the program [done - Zach].
-Press 1 to sign up [done - Zach].
-Press 2 to delete your account and all your data [done - Zach].
-Press 3 to change or cancel your subscription [- Bayla].
-Press 4 to sign up to be a driver [working - josh].
-Press 5 to register a new employee at the warehouse [- Berend].
-Press 6 to enter SQL queries directly [done - Zach].
+Press 0 to exit the program.
+Press 1 to sign up.
+Press 2 to delete your account and all your data.
+Press 3 to change or cancel your subscription.
+Press 4 to sign up to be a driver.
+Press 5 to register a new employee at the warehouse.
+Press 6 to enter SQL queries directly.
 )";
 
         std::cout << prompt << std::endl; // Outputs the prompt to the console
@@ -135,18 +135,12 @@ Press 4 to remove by your user ID.
         // will use variable u_email and u_password to verify account giving you access to change your subscription/cancel
         std::string edit_subscription =
             R"(
-Press 1 to change subscription.
-Press 2 to cancel subscription.
+Press 0 to cancel subscription.
+Press # associated with the subscription you want.
 )";
         std::string identify_user_for_subscription = R"(
 Press 1 to indentify by your email.
 Press 2 to indentify by your phone number.
-Press 3 to indentify by your User ID.
-)";
-
-        std::string remove_or_update_subscription_prompt = R"(
-Press 0 to remove your subscription.
-Or press the subscription number you would like to change to.
 )";
 
         std::string u_plan; // the user plan they chose when they signed up
@@ -495,7 +489,7 @@ Or press the subscription number you would like to change to.
             {       // s //
             case 1: // BY EMAIL
             {       // case 1 //
-                std::cout << "Enter the email of the user you wish to change or edit the subscription for: ";
+                std::cout << "Enter the email of the user you wish to edit or cancel the subscription for: ";
                 std::cin >> u_email;
                 std::cin.ignore(); // ignore / consume the leftover newline character
 
@@ -523,7 +517,7 @@ Or press the subscription number you would like to change to.
                 rc = sqlite3_exec(db, get_plan_query.c_str(), callback, 0, &zErrMsg);
 
                 // Prompt user
-                std::cout << remove_or_update_subscription_prompt << std::endl;
+                std::cout << edit_subscription << std::endl;
 
                 std::cin >> u_plan_subscription_choice;
 
@@ -538,7 +532,7 @@ Or press the subscription number you would like to change to.
                     }
                     else
                     {
-                        std::cout << "Subscription removed successfully.\n";
+                        std::cout << "Subscription Cancelled.\n";
                     }
                 }
                 else
@@ -561,14 +555,68 @@ Or press the subscription number you would like to change to.
             } // case 1 //
             case 2: // IDENTIFY USER BY PHONE NUMBER
             {       // case 2 //
+                std::cout << "Enter the phone number of the user you wish to edit or cancel the subscription for: ";
+                std::cin >> u_phone;
+                std::cin.ignore(); // ignore / consume the leftover newline character
 
-                //
+                // Escape single quotes in user inputs
+                u_phone = EscapeSingleQuotes(u_phone);
+
+                // Check if the email even exists
+                std::string check_query = "SELECT 1 FROM USER WHERE Phone = '" + u_phone + "' LIMIT 1;";
+                bool exists = false;
+                rc = sqlite3_exec(db, check_query.c_str(), exists_callback, &exists, &zErrMsg);
+
+                if (!exists)
+                {
+                    std::cout << "Phone number does not exist. Please rerun and try again.\n";
+                    break;
+                }
+                std::cout << "Here are the following plan options:\n";
+                rc = sqlite3_exec(db, "SELECT PlanID, Name, Price, Calories, Frequency, NumberOfMeals FROM PLAN;", callback, 0, &zErrMsg);
+                std::cout << "\nYour current plan is: \n";
+
+                // Get the users current plan
+                std::string get_plan_query = "SELECT PlanID FROM PLAN WHERE PlanID = (SELECT PlanID FROM USER WHERE Phone = '" + u_phone + "');";
+                rc = sqlite3_exec(db, get_plan_query.c_str(), callback, 0, &zErrMsg);
+
+                // Prompt user
+                std::cout << edit_subscription << std::endl;
+
+                std::cin >> u_plan_subscription_choice;
+
+                if (u_plan_subscription_choice == 0)
+                {
+                    std::string remove_query = "DELETE FROM USER WHERE Phone = '" + u_phone + "';";
+                    rc = sqlite3_exec(db, remove_query.c_str(), callback, 0, &zErrMsg);
+                    if (rc != SQLITE_OK)
+                    {
+                        std::cerr << "SQL error: " << zErrMsg << std::endl;
+                        sqlite3_free(zErrMsg);
+                    }
+                    else
+                    {
+                        std::cout << "Subscription removed successfully.\n";
+                    }
+                }
+                else
+                {
+                    // update the subscription
+                    std::string update_query = "UPDATE USER SET PlanID = " + std::to_string(u_plan_subscription_choice) + " WHERE Phone = '" + u_phone + "';";
+                    rc = sqlite3_exec(db, update_query.c_str(), callback, 0, &zErrMsg);
+                    if (rc != SQLITE_OK)
+                    {
+                        std::cerr << "SQL error: " << zErrMsg << std::endl;
+                        sqlite3_free(zErrMsg);
+                    }
+                    else
+                    {
+                        std::cout << "Subscription updated successfully.\n";
+                    }
+                }
+
                 break;
             } // case 2 //
-            case 3: // IDENTIFY USER BY USER ID
-            {       // case 4 //
-                break;
-            } // case 4 //
             default:
             { // default //
                 std::cout << "You entered an invalid choice. Please rerun and try again.\n";
